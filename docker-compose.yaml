@@ -1,0 +1,25 @@
+services:
+
+  api:
+    image: ghcr.io/brunoqkz/pismo:latest
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pismo-app
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: pismo-app
+      POSTGRES_USER: pismo-database-user
+      POSTGRES_PASSWORD: pismo-database-password
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pismo-database-user -d pismo-app" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "127.0.0.1:5432:5432"
